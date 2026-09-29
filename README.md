@@ -1,27 +1,33 @@
 # my-pi — 我的 pi 个人定制层（纯源码仓库）
 
-把 pi（@earendil-works/pi-coding-agent）配成我习惯的样子。pi 本体用 npm 装。
+把 pi（@earendil-works/pi-coding-agent）配成我习惯的样子。pi 本体用 npm 装（官方底座）。
 
 本仓库**只是源码存档**：所有定制（扩展、provider、记忆、中文补丁）都以**本地文件**形式加载到
-`~/.pi/agent/`。**不加入 `settings.json` 的 `packages`，pi 启动时不会 clone / 更新 / 联网同步本仓库**。
-更新定制 = 在仓库里改文件、提交推送，需要时再手动运行下面的同步步骤。
+`~/.pi/agent/`。扩展按**功能分子目录**组织（pi 原生规则：`extensions/<功能>/index.ts`，一层为限），
+**不加入 `settings.json` 的 `packages`，pi 启动时不会 clone / 更新 / 联网同步本仓库**。
+更新定制 = 在仓库里改文件、提交推送，需要时再手动运行同步步骤。
 
 ## 目录说明
 
-| 路径 | 内容 |
-|---|---|
-| `provider/xinshu.ts` | xinshu 模型 provider 扩展（含我的定制：gpt-6-astra、1.05M 上下文、max 档位），复制到 `~/.pi/agent/extensions/` 后作为本地扩展加载 |
-| `extensions/session-trash.ts` | 自写扩展：`/trash` `/trashlist` `/trashrestore` `/trashpurge` 会话归档/恢复命令 |
-| `extensions/manual-memory.ts` | 记忆扩展 |
-| `manual-memory.md` | 长期记忆（用户偏好） |
-| `patch-slash-commands-zh.js` | 给内置 / 命令说明加中文的补丁脚本（可重复执行） |
-| `patch-keybindings-zh.js` | 给内置快捷键说明（/hotkeys）加中文的补丁脚本（可重复执行） |
-| `setup.ps1` | 新机器一键安装脚本（Windows） |
-| `setup.sh` | 新机器一键安装脚本（macOS / Linux） |
+```
+├── extensions/                 # 所有代码类功能，一个功能一个子目录
+│   ├── trash/index.ts          # 会话回收站：/trash /trashlist /trashrestore /trashpurge
+│   ├── memory/
+│   │   ├── index.ts            # 记忆扩展：/memory /remember
+│   │   └── manual-memory.md    # 长期记忆数据（与代码同目录）
+│   └── xinshu/index.ts         # xinshu provider（gpt-6-astra、1.1M 上下文等定制）
+├── scripts/                    # 维护脚本（中文补丁，升级 pi 后重跑）
+│   ├── patch-slash-commands-zh.js
+│   └── patch-keybindings-zh.js
+├── setup.ps1                   # 新机器一键安装（Windows）
+├── setup.sh                    # 新机器一键安装（macOS / Linux）
+└── README.md
+```
 
-> 说明：所有扩展（xinshu / session-trash / manual-memory / lab-qwen）都从
-> `~/.pi/agent/extensions/` 直接加载，不走 pi 包机制；仓库里没有 `package.json`，
-> 不会被误装为远程包。
+> 说明：
+> - 本地 `~/.pi/agent/extensions/` 还会多一个 `lab-qwen/` 子目录（含个人 API Key，**不入库**）。
+> - 技能（skills）、提示模板（prompts）、主题（themes）走 pi 的官方目录（如 `skills/`），不塞进 extensions。
+> - 仓库没有 `package.json`，不会被误装为远程 pi 包。
 
 ## ⚠️ 不入库的文件（需从旧机手动拷贝）
 
@@ -31,7 +37,7 @@
 | `models.json` | 自定义 provider/模型（3 个内网 vLLM 端点） |
 | `models-store.json` | pi 模型数据缓存 |
 | `auth.json` | API 密钥，新机器自行 `/login` |
-| `extensions/lab-qwen.ts` | 内含个人 API Key |
+| `extensions/lab-qwen/index.ts` | 内含个人 API Key |
 | `trust.json` | 本机项目信任记录，pi 首次打开项目会重新询问 |
 
 ## 新机器使用步骤（三步，跨平台）
@@ -76,30 +82,30 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
 | `/trashlist` | 查看回收站 |
 | `/trashrestore` | 从回收站恢复一个会话 |
 | `/trashpurge` | 清空回收站（不可恢复） |
+| `/memory` | 编辑长期记忆 |
+| `/remember` | 追加一条长期偏好 |
 
 ## 更新（本机 → 仓库）
 
-只同步仓库中允许公开的文件，不要把 `settings.json`、`auth.json`、`models.json`、`models-store.json`、`trust.json` 或 `lab-qwen.ts` 加入仓库。
+只同步仓库中允许公开的文件，不要把 `settings.json`、`auth.json`、`models.json`、`models-store.json`、`trust.json` 或 `extensions/lab-qwen/` 加入仓库。
 
 **Windows（PowerShell）**：在仓库目录执行
 ```powershell
-Copy-Item "$env:USERPROFILE\.pi\agent\extensions\session-trash.ts" .\extensions\ -Force
-Copy-Item "$env:USERPROFILE\.pi\agent\extensions\manual-memory.ts" .\extensions\ -Force
-Copy-Item "$env:USERPROFILE\.pi\agent\extensions\xinshu.ts" .\provider\xinshu.ts -Force
-Copy-Item "$env:USERPROFILE\.pi\agent\manual-memory.md" .\ -Force
+Copy-Item "$env:USERPROFILE\.pi\agent\extensions\trash\index.ts" .\extensions\trash\ -Force
+Copy-Item "$env:USERPROFILE\.pi\agent\extensions\memory\*" .\extensions\memory\ -Force
+Copy-Item "$env:USERPROFILE\.pi\agent\extensions\xinshu\index.ts" .\extensions\xinshu\ -Force
 git status
-git add README.md extensions manual-memory.md patch-*.js setup.ps1 setup.sh provider
+git add README.md extensions setup.ps1 setup.sh scripts
 git diff --cached --check
 ```
 
 **macOS / Linux**：在仓库目录执行
 ```bash
-cp "$HOME/.pi/agent/extensions/session-trash.ts" ./extensions/
-cp "$HOME/.pi/agent/extensions/manual-memory.ts" ./extensions/
-cp "$HOME/.pi/agent/extensions/xinshu.ts" ./provider/xinshu.ts
-cp "$HOME/.pi/agent/manual-memory.md" ./
+cp "$HOME/.pi/agent/extensions/trash/index.ts" ./extensions/trash/
+cp -R "$HOME/.pi/agent/extensions/memory/." ./extensions/memory/
+cp "$HOME/.pi/agent/extensions/xinshu/index.ts" ./extensions/xinshu/
 git status
-git add README.md extensions manual-memory.md patch-*.js setup.ps1 setup.sh provider
+git add README.md extensions setup.ps1 setup.sh scripts
 git diff --cached --check
 ```
 

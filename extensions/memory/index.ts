@@ -1,6 +1,8 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 
 const MAX_MEMORY_BYTES = 32 * 1024;
@@ -18,7 +20,24 @@ function getAgentDir(): string {
 	return configured ? resolve(expandHome(configured)) : join(homedir(), ".pi", "agent");
 }
 
-const memoryFile = join(getAgentDir(), "manual-memory.md");
+// 记忆文件与本扩展同目录（memory/manual-memory.md）；
+// 若同目录没有而旧位置（agent 根目录）有，则回退旧位置，保证平滑迁移。
+function getExtensionDir(): string {
+	try {
+		return dirname(fileURLToPath(import.meta.url));
+	} catch {
+		try {
+			// eslint-disable-next-line no-undef
+			return __dirname;
+		} catch {
+			return process.cwd();
+		}
+	}
+}
+
+const here = join(getExtensionDir(), "manual-memory.md");
+const legacy = join(getAgentDir(), "manual-memory.md");
+const memoryFile = existsSync(here) ? here : legacy;
 
 function normalizeMemory(content: string): string {
 	const trimmed = content.trim();
