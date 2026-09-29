@@ -14,6 +14,7 @@
 | `manual-memory.md` | 长期记忆（用户偏好） |
 | `patch-slash-commands-zh.js` | 给内置 / 命令说明加中文的补丁脚本（可重复执行） |
 | `patch-keybindings-zh.js` | 给内置快捷键说明（/hotkeys）加中文的补丁脚本（可重复执行） |
+| `setup.ps1` | 新机器一键安装脚本（部署定制文件 + 打中文补丁） |
 
 > 说明：你自己的扩展（session-trash / manual-memory / lab-qwen）始终从 `~/.pi/agent/extensions/` 加载，
 > 不走包机制；pi 包的清单只暴露 `./provider`，两者不重叠、不会重复注册。
@@ -29,32 +30,21 @@
 | `extensions/lab-qwen.ts` | 内含个人 API Key |
 | `trust.json` | 本机项目信任记录，pi 首次打开项目会重新询问 |
 
-## 新机器使用步骤
+## 新机器使用步骤（三步）
 
 ```powershell
 # 1. 安装 pi 本体
 npm i -g @earendil-works/pi-coding-agent
 
-# 2. 把本仓库内容复制到 pi 配置目录（已有文件会被覆盖，建议先备份）
-$dst = Join-Path $env:USERPROFILE ".pi\agent"
-Copy-Item -Recurse -Force .\* $dst
+# 2. 克隆本仓库
+gh repo clone mitongchuan-hub/my-pi
+cd my-pi
 
-# 3. 手动补上不入库的个人文件（从旧机拷贝）
-#    - settings.json      → $dst\settings.json
-#    - auth.json          → $dst\auth.json
-#    - extensions\lab-qwen.ts → $dst\extensions\lab-qwen.ts
-#    - models.json            → $dst\models.json
-#    - models-store.json      → $dst\models-store.json
-
-# 4. settings.json 的 packages 字段已指向本仓库，pi 启动会自动装 provider/xinshu.ts
-#    （若未自动，用 pi 包管理器按 settings.json 的 packages 安装）
-
-# 5. 给内置命令 + 快捷键加中文说明（pi 升级后也要重跑）
-node $dst\patch-slash-commands-zh.js
-node $dst\patch-keybindings-zh.js
-
-# 6. 重启 pi，/login 配置模型认证，开始使用
+# 3. 一键安装（部署定制文件 + 打中文补丁）
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
 ```
+
+脚本会自动部署扩展/记忆/provider、打中文补丁，并在末尾提示你还需手动拷贝的个人文件（settings.json / auth.json / models.json / models-store.json / lab-qwen.ts）。拷完这些，启动 pi `/login` 即可使用。
 
 ## 常用自定义命令
 
