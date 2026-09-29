@@ -51,7 +51,7 @@ function errorMessage(error: unknown): string {
 
 export default function manualMemoryExtension(pi: ExtensionAPI) {
 	pi.registerCommand("memory", {
-		description: "Edit manually maintained long-term preferences",
+		description: "Edit manually maintained long-term preferences｜编辑手工维护的长期偏好",
 		handler: async (_args, ctx) => {
 			if (!ctx.hasUI) {
 				ctx.ui.notify(`Manual memory file: ${memoryFile}`, "info");
@@ -78,7 +78,7 @@ export default function manualMemoryExtension(pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("remember", {
-		description: "Append one manually supplied long-term preference",
+		description: "Append one manually supplied long-term preference｜追加一条长期偏好",
 		handler: async (args, ctx) => {
 			const preference = args.trim();
 			if (!preference) {
