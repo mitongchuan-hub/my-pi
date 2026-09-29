@@ -18,6 +18,7 @@
 - **pi 本体**——用 `npm i -g @earendil-works/pi-coding-agent` 装最新版
 - pi 包（如 pi-xinshu）——`settings.json` 的 `packages` 字段已声明，pi 启动时自动从 GitHub 安装
 - `auth.json`（API 密钥）——**刻意排除**，新机器需自行 `/login` 或手动从旧机拷贝
+- lab-qwen 的 API Key——新机器写入 `~/.pi/agent/secrets/lab-qwen.key`（或设环境变量 `LAB_QWEN_API_KEY`）
 - `skills/`、`skill-install/`（第三方技能，按需另装）
 - `runtimes/`（技能运行时，pi 会按需自动下载）
 - `sessions/`（对话历史）
