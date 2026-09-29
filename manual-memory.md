@@ -8,7 +8,3 @@
 
 ## 环境（本机）
 - Windows + PowerShell：用 `curl.exe`（非 curl 别名），GitHub 加 `--ssl-no-revoke`；无 `head` 等 Linux 命令。
-- PowerShell 内联 `node -e` 含正则/特殊字符易被破坏 → 写成 .js 文件再 `node xxx.js` 执行。
-- GitHub 连接失败时走本地代理：`$env:HTTPS_PROXY="http://127.0.0.1:7890"`。
-- pi 配置目录：`~/.pi/agent/`；pi 本体用 `npm i -g @earendil-works/pi-coding-agent` 安装。
-- 个人仓库：github.com/mitongchuan-hub/my-pi（只放代码性质定制：扩展、补丁脚本、记忆；配置一律手动拷贝）。
