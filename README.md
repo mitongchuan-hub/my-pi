@@ -6,7 +6,7 @@
 
 | 路径 | 内容 |
 |---|---|
-| `extensions/` | 自写扩展：session-trash（会话归档四命令）、lab-qwen、manual-memory |
+| `extensions/` | 自写扩展：session-trash（会话归档四命令）、manual-memory |
 | `manual-memory.md` | 长期记忆（用户偏好） |
 | `settings.json` | pi 全局设置 |
 | `models.json` / `models-store.json` | 模型配置（无密钥，apiKey 均为 EMPTY，走 auth.json） |
@@ -17,7 +17,7 @@
 - **pi 本体**——用 `npm i -g @earendil-works/pi-coding-agent` 装最新版
 - pi 包（如 pi-xinshu）——`settings.json` 的 `packages` 字段已声明，pi 启动时自动从 GitHub 安装
 - `auth.json`（API 密钥）——**刻意排除**，新机器需自行 `/login` 或手动从旧机拷贝
-- lab-qwen 的 API Key——新机器写入 `~/.pi/agent/secrets/lab-qwen.key`（或设环境变量 `LAB_QWEN_API_KEY`）
+- `extensions/lab-qwen.ts`——内含个人 API Key，**故意不入库**，需从旧机手动拷贝到 `~/.pi/agent/extensions/`
 - `skills/`、`skill-install/`（第三方技能，按需另装）
 - `runtimes/`（技能运行时，pi 会按需自动下载）
 - `sessions/`（对话历史）
@@ -58,5 +58,7 @@ pi   # 进入后执行 /login <provider>
 ```powershell
 # 同步回仓库并推送（在仓库目录下）
 robocopy ..\.pi\agent . extensions manual-memory.md settings.json models.json models-store.json /E /XO
+# 若本机新增了 lab-qwen.ts 等含密钥文件，同步后务必检查并从仓库删掉：
+git status   # 确认 lab-qwen.ts 不在待提交列表里
 git add -A; git commit -m "sync"; git push
 ```
