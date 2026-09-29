@@ -5,14 +5,29 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-// npm 全局根目录（Windows 下即 %APPDATA%\npm\node_modules）
-let pkgRoot;
-try {
-  const { execSync } = require('child_process');
-  pkgRoot = execSync('npm root -g', { encoding: 'utf8' }).trim();
-} catch {
-  pkgRoot = path.join(os.homedir(), 'AppData/Roaming/npm/node_modules');
+// 跨平台定位 npm 全局包目录
+function getGlobalPackageRoot() {
+  try {
+    const { execSync } = require('child_process');
+    const root = execSync('npm root -g', { encoding: 'utf8' }).trim();
+    if (root) return root;
+  } catch {
+    // 继续尝试常见的 npm 全局目录
+  }
+
+  const candidates = process.platform === 'win32'
+    ? [path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules')]
+    : [
+        path.join(os.homedir(), '.npm-global', 'lib', 'node_modules'),
+        '/usr/local/lib/node_modules',
+        '/usr/lib/node_modules',
+      ];
+  const fallback = candidates.find(candidate => fs.existsSync(candidate));
+  if (fallback) return fallback;
+  throw new Error('无法定位 npm 全局包目录，请确认 Node.js/npm 已安装。');
 }
+
+const pkgRoot = getGlobalPackageRoot();
 const file = path.join(
   pkgRoot,
   '@earendil-works', 'pi-coding-agent', 'dist', 'core', 'slash-commands.js'

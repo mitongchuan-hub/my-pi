@@ -5,10 +5,34 @@
  */
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
+// 跨平台定位 npm 全局包目录
+function getGlobalPackageRoot() {
+  try {
+    const { execSync } = require('child_process');
+    const root = execSync('npm root -g', { encoding: 'utf8' }).trim();
+    if (root) return root;
+  } catch {
+    // 继续尝试常见的 npm 全局目录
+  }
+
+  const candidates = process.platform === 'win32'
+    ? [path.join(os.homedir(), 'AppData', 'Roaming', 'npm', 'node_modules')]
+    : [
+        path.join(os.homedir(), '.npm-global', 'lib', 'node_modules'),
+        '/usr/local/lib/node_modules',
+        '/usr/lib/node_modules',
+      ];
+  const fallback = candidates.find(candidate => fs.existsSync(candidate));
+  if (fallback) return fallback;
+  throw new Error('无法定位 npm 全局包目录，请确认 Node.js/npm 已安装。');
+}
+
+const pkgRoot = getGlobalPackageRoot();
 const FILE = path.join(
-  process.env.APPDATA,
-  'npm/node_modules/@earendil-works/pi-coding-agent/dist/core/keybindings.js'
+  pkgRoot,
+  '@earendil-works', 'pi-coding-agent', 'dist', 'core', 'keybindings.js'
 );
 
 const ZH = {
@@ -59,10 +83,22 @@ const ZH = {
 let content = fs.readFileSync(FILE, 'utf8');
 let patched = 0, skipped = 0, missing = 0;
 for (const [en, zh] of Object.entries(ZH)) {
-  const re = new RegExp(`(description:\\s*")${en.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}(")`);
-  if (!re.test(content)) { missing++; continue; }
-  if (new RegExp(`${en.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&')}｜`).test(content)) { skipped++; continue; }
-  content = content.replace(re, `$1${en}｜${zh}$2`);
+  const patchedText = `${en}｜`;
+  if (content.includes(patchedText)) {
+    skipped++;
+    continue;
+  }
+
+  const original = `description: "${en}"`;
+  if (!content.includes(original)) {
+    missing++;
+    continue;
+  }
+
+  content = content.replace(
+    original,
+    `description: "${en}｜${zh}"`
+  );
   patched++;
 }
 fs.writeFileSync(FILE, content, 'utf8');
@@ -71,4 +107,4 @@ fs.writeFileSync(FILE, content, 'utf8');
 const all = [...content.matchAll(/description:\s*"([^"]*)"/g)].map(m => m[1]);
 const withZh = all.filter(s => /[\u4e00-\u9fff]/.test(s));
 console.log(`补丁 ${patched} 条 | 已存在 ${skipped} 条 | 未找到 ${missing} 条`);
-console.log(`文件内 description 共 ${all.length} 条，含中文 ${withZh} 条`);
+console.log(`文件内 description 共 ${all.length} 条，含中文 ${withZh.length} 条`);
