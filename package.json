@@ -1,0 +1,10 @@
+{
+  "name": "my-pi",
+  "version": "1.0.0",
+  "description": "My pi personal layer: xinshu provider + custom extensions + zh patch",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "pi": {
+    "extensions": ["./provider"]
+  }
+}
