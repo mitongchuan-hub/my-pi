@@ -1,0 +1,13 @@
+{
+  "packages": [
+    "git:github.com/smilefufu/pi-xinshu"
+  ],
+  "lastChangelogVersion": "0.82.1",
+  "defaultProvider": "xinshu",
+  "defaultModel": "gpt-6-sol",
+  "defaultThinkingLevel": "medium",
+  "shellPath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "shellCommandPrefix": "[Console]::OutputEncoding=[System.Text.Encoding]::UTF8; $OutputEncoding=[System.Text.Encoding]::UTF8",
+  "theme": "dark",
+  "hideThinkingBlock": true
+}
