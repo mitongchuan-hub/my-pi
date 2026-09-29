@@ -10,7 +10,6 @@
 | `manual-memory.md` | 长期记忆（用户偏好） |
 | `settings.json` | pi 全局设置 |
 | `models.json` / `models-store.json` | 模型配置（无密钥，apiKey 均为 EMPTY，走 auth.json） |
-| `trust.json` | 项目信任记录 |
 | `patch-slash-commands-zh.js` | 给内置 / 命令说明加中文的补丁脚本（可重复执行） |
 
 ## ⚠️ 不含什么
@@ -22,6 +21,7 @@
 - `skills/`、`skill-install/`（第三方技能，按需另装）
 - `runtimes/`（技能运行时，pi 会按需自动下载）
 - `sessions/`（对话历史）
+- `trust.json`（本机项目信任记录，pi 首次打开项目时会重新询问）
 
 ## 新机器使用步骤
 
@@ -57,6 +57,6 @@ pi   # 进入后执行 /login <provider>
 
 ```powershell
 # 同步回仓库并推送（在仓库目录下）
-robocopy ..\.pi\agent . extensions manual-memory.md settings.json models.json models-store.json trust.json /E /XO
+robocopy ..\.pi\agent . extensions manual-memory.md settings.json models.json models-store.json /E /XO
 git add -A; git commit -m "sync"; git push
 ```
