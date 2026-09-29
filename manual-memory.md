@@ -6,11 +6,6 @@
 - 没理解清楚就先问、继续交流，确认后再动手。
 - 倾向"能简则简"：仓库/文件能不放就不放，多余的东西主动指出并清理。
 
-## 安全
-- 含 API key / 个人配置的文件一律不进远程仓库（settings.json、auth.json、lab-qwen.ts、models*.json 等）。
-- 密钥若必须用：环境变量或 `~/.pi/agent/secrets/` 下的独立文件，不写死在代码里。
-- 误提交过密钥时：改代码 + 重写 git 历史强推 + 本地/远端/对象库三重验证 + 建议轮换密钥。
-
 ## 环境（本机）
 - Windows + PowerShell：用 `curl.exe`（非 curl 别名），GitHub 加 `--ssl-no-revoke`；无 `head` 等 Linux 命令。
 - PowerShell 内联 `node -e` 含正则/特殊字符易被破坏 → 写成 .js 文件再 `node xxx.js` 执行。
